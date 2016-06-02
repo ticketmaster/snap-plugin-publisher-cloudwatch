@@ -53,4 +53,4 @@ README.html
 .terraformer/
 
 # Go
-
+vendor/

@@ -16,7 +16,7 @@
 #limitations under the License.
 
 default:
-	$(MAKE) deps
+#	$(MAKE) deps
 	$(MAKE) all
 deps:
 	bash -c "godep restore"
@@ -25,4 +25,4 @@ test:
 check:
 	$(MAKE) test
 all:
-	bash -c "./scripts/build.sh `pwd``"
+	bash -c "./scripts/build.sh $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))"

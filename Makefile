@@ -16,7 +16,7 @@
 #limitations under the License.
 
 default:
-#	$(MAKE) deps
+	$(MAKE) deps
 	$(MAKE) all
 deps:
 	bash -c "godep restore"

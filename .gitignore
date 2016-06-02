@@ -51,3 +51,6 @@ README.html
 *.tfstate*
 .terraform/
 .terraformer/
+
+# Go
+

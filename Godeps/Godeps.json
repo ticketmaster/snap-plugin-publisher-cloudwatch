@@ -1,0 +1,79 @@
+{
+	"ImportPath": "git.tm.tmcs/AWS/snap-plugin-publisher-cloudwatch",
+	"GoVersion": "go1.6",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.7.3",
+			"Rev": "55eb11d21d2a31a3cc93838241d04800f52e823d"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/control/plugin",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/control/plugin/cpolicy",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/control/plugin/encoding",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/control/plugin/encrypter",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/core",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/core/cdata",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/core/ctypes",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/core/serror",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/pkg/ctree",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/pkg/schedule",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/intelsdi-x/snap/scheduler/wmap",
+			"Comment": "v0.13.0-beta-131-g4d7d4ca",
+			"Rev": "4d7d4ca909d51bfc21399536d3513a8bb49a35be"
+		},
+		{
+			"ImportPath": "github.com/robfig/cron",
+			"Comment": "v1-7-g32d9c27",
+			"Rev": "32d9c273155a0506d27cf73dd1246e86a470997e"
+		},
+		{
+			"ImportPath": "github.com/ticketmaster/snap-plugin-publisher-cloudwatch/cloudwatch",
+			"Rev": "62daba4b3720ba98d0a90d146d1ebb9af4b527f0"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "c1cd2254a6dd314c9d73c338c12688c9325d85c6"
+		}
+	]
+}

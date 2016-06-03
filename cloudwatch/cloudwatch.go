@@ -3,13 +3,19 @@ package cloudwatch
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cloudwatch"
+
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
+	"time"
 )
 
 func Meta() *plugin.PluginMeta {
@@ -31,7 +37,10 @@ const (
 
 func (rmq *cloudwatchPublisher) Publish(contentType string, content []byte, config map[string]ctypes.ConfigValue) error {
 	logger := log.New()
+	svc := cloudwatch.New(session.New())
+
 	var metrics []plugin.MetricType
+
 	switch contentType {
 	case plugin.SnapGOBContentType:
 		dec := gob.NewDecoder(bytes.NewBuffer(content))
@@ -39,14 +48,23 @@ func (rmq *cloudwatchPublisher) Publish(contentType string, content []byte, conf
 			logger.Printf("Error decoding: error=%v content=%v", err, content)
 			return err
 		}
+	case plugin.SnapJSONContentType:
+		err := json.Unmarshal(content, &metrics)
+		if err != nil {
+			logger.Printf("Error decoding JSON: error=%v content=%v", err, content)
+			return err
+		}
 	default:
 		logger.Printf("Error unknown content type '%v'", contentType)
 		return fmt.Errorf("Unknown content type '%s'", contentType)
 	}
+
 	err := publishDataToCloudWatch(
 		metrics,
+		svc,
 		logger,
 	)
+
 	return err
 }
 
@@ -58,7 +76,25 @@ func (rmq *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error)
 	return cp, nil
 }
 
-func publishDataToCloudWatch(metrics []plugin.MetricType, logger *log.Logger) error {
+func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, logger *log.Logger) error {
+	for _, m := range metrics {
+		input := &cloudwatch.PutMetricDataInput{
+			MetricData: []*cloudwatch.MetricDatum{
+				{
+					MetricName: aws.String(m.Namespace()),
+					Timestamp: aws.Time(m.Timestamp()),
+					Unit: aws.String("StandardUnit"),
+					Value: aws.Float64(m.Data()),
+				},
+			},
+			Namespace: aws.String("snap"),
+		}
+
+		_, err := svc.PutMetricData(input)
+		if err != nil {
+			handleErr(err)
+		}
+	}
 
 	return nil
 }

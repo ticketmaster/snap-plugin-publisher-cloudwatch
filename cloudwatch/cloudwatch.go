@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"encoding/json"
+	"strings"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,19 +16,7 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
-	"time"
 )
-
-func Meta() *plugin.PluginMeta {
-	return plugin.NewPluginMeta(name, version, pluginType, []string{plugin.SnapGOBContentType}, []string{plugin.SnapGOBContentType})
-}
-
-type cloudwatchPublisher struct{}
-
-func NewCloudWatchPublisher() *cloudwatchPublisher {
-	return &cloudwatchPublisher{}
-
-}
 
 const (
 	name       = "cloudwatch"
@@ -35,7 +24,27 @@ const (
 	pluginType = plugin.PublisherPluginType
 )
 
-func (rmq *cloudwatchPublisher) Publish(contentType string, content []byte, config map[string]ctypes.ConfigValue) error {
+func Meta() *plugin.PluginMeta {
+	return plugin.NewPluginMeta(name, version, pluginType, []string{plugin.SnapGOBContentType}, []string{plugin.SnapGOBContentType})
+}
+
+func NewCloudWatchPublisher() *cloudwatchPublisher {
+	return &cloudwatchPublisher{}
+
+}
+
+type cloudwatchPublisher struct{}
+
+func (p *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
+	cp := cpolicy.New()
+	config := cpolicy.NewPolicyNode()
+
+	cp.Add([]string{""}, config)
+
+	return cp, nil
+}
+
+func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config map[string]ctypes.ConfigValue) error {
 	logger := log.New()
 	svc := cloudwatch.New(session.New())
 
@@ -68,23 +77,15 @@ func (rmq *cloudwatchPublisher) Publish(contentType string, content []byte, conf
 	return err
 }
 
-func (rmq *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
-	cp := cpolicy.New()
-	config := cpolicy.NewPolicyNode()
-
-	cp.Add([]string{""}, config)
-	return cp, nil
-}
-
 func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, logger *log.Logger) error {
 	for _, m := range metrics {
 		input := &cloudwatch.PutMetricDataInput{
 			MetricData: []*cloudwatch.MetricDatum{
 				{
-					MetricName: aws.String(m.Namespace()),
+					MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
 					Timestamp: aws.Time(m.Timestamp()),
 					Unit: aws.String("StandardUnit"),
-					Value: aws.Float64(m.Data()),
+					Value: aws.Float64(m.Data().(float64)),
 				},
 			},
 			Namespace: aws.String("snap"),

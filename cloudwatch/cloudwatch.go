@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
+	"strings"
 )
 
 const (
@@ -77,7 +79,11 @@ func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config
 }
 
 func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, logger *log.Logger) error {
-	//for _, m := range metrics {
+	for _, m := range metrics {
+		logger.Println(strings.Join(m.Namespace().Strings(), "."))
+		logger.Println(m.Timestamp().String())
+		logger.Println(m.Data().(float64))
+
 		//input := &cloudwatch.PutMetricDataInput{
 		//	MetricData: []*cloudwatch.MetricDatum{
 		//		{
@@ -100,7 +106,7 @@ func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudW
 		//if err != nil {
 		//	handleErr(err)
 		//}
-	//}
+	}
 
 	return nil
 }

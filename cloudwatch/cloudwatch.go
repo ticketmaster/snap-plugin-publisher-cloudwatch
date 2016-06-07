@@ -24,6 +24,8 @@ const (
 	pluginType = plugin.PublisherPluginType
 )
 
+type cloudwatchPublisher struct{}
+
 func Meta() *plugin.PluginMeta {
 	return plugin.NewPluginMeta(name, version, pluginType, []string{plugin.SnapGOBContentType}, []string{plugin.SnapGOBContentType})
 }
@@ -33,12 +35,15 @@ func NewCloudWatchPublisher() *cloudwatchPublisher {
 
 }
 
-type cloudwatchPublisher struct{}
-
 func (p *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
 	cp := cpolicy.New()
 	config := cpolicy.NewPolicyNode()
 
+	param1, err := cpolicy.NewStringRule("region", true)
+	handleErr(err)
+	param1.Description = "AWS Region"
+
+	config.Add(param1)
 	cp.Add([]string{""}, config)
 
 	return cp, nil
@@ -46,7 +51,9 @@ func (p *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
 
 func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config map[string]ctypes.ConfigValue) error {
 	logger := log.New()
-	svc := cloudwatch.New(session.New())
+	svc := cloudwatch.New(session.New(&aws.Config{Region: aws.String(config["region"])}))
+
+	logger.Println("Publishing started")
 
 	var metrics []plugin.MetricType
 
@@ -82,10 +89,14 @@ func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudW
 		input := &cloudwatch.PutMetricDataInput{
 			MetricData: []*cloudwatch.MetricDatum{
 				{
-					MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
+					//MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
+					//Timestamp: aws.Time(m.Timestamp()),
+					//Unit: aws.String("StandardUnit"),
+					//Value: aws.Float64(m.Data().(float64)),
+					MetricName: aws.String("MetricsName"),
 					Timestamp: aws.Time(m.Timestamp()),
 					Unit: aws.String("StandardUnit"),
-					Value: aws.Float64(m.Data().(float64)),
+					Value: aws.Float64(1.0),
 				},
 			},
 			Namespace: aws.String("snap"),

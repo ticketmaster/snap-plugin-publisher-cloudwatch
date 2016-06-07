@@ -3,8 +3,6 @@ package cloudwatch
 import (
 	"bytes"
 	"encoding/gob"
-	"encoding/json"
-	"strings"
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
@@ -51,7 +49,7 @@ func (p *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
 
 func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config map[string]ctypes.ConfigValue) error {
 	logger := log.New()
-	svc := cloudwatch.New(session.New(&aws.Config{Region: aws.String(config["region"])}))
+	svc := cloudwatch.New(session.New(&aws.Config{Region: aws.String(config["region"].(ctypes.ConfigValueStr).Value)}))
 
 	logger.Println("Publishing started")
 
@@ -79,11 +77,7 @@ func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config
 }
 
 func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, logger *log.Logger) error {
-	logger.Printf(metrics)
-
-	for _, m := range metrics {
-		logger.Printf(m)
-
+	//for _, m := range metrics {
 		//input := &cloudwatch.PutMetricDataInput{
 		//	MetricData: []*cloudwatch.MetricDatum{
 		//		{
@@ -106,7 +100,7 @@ func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudW
 		//if err != nil {
 		//	handleErr(err)
 		//}
-	}
+	//}
 
 	return nil
 }

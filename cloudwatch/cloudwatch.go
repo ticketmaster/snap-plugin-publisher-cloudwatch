@@ -85,10 +85,11 @@ func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudW
 					MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
 					Timestamp: aws.Time(m.Timestamp()),
 					Unit: aws.String("StandardUnit"),
-					Value: aws.Float64(m.Data().(float64)),
+					//Value: aws.Float64(m.Data().(float64)),
+					Value: aws.Float64(4.3),
 				},
 			},
-			Namespace: aws.String("snap"),
+			Namespace: aws.String("snap-test"),
 		}
 
 		logger.Printf(input)

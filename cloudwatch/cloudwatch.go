@@ -79,32 +79,32 @@ func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config
 
 func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, logger *log.Logger) error {
 	for _, m := range metrics {
-		logger.Println(strings.Join(m.Namespace().Strings(), "."))
-		logger.Println(m.Timestamp().String())
-		logger.Println(m.Data().(float64))
+		//logger.Println(strings.Join(m.Namespace().Strings(), "."))
+		//logger.Println(m.Timestamp().String())
+		//logger.Println(m.Data())
 
-		//input := &cloudwatch.PutMetricDataInput{
-		//	MetricData: []*cloudwatch.MetricDatum{
-		//		{
-		//			//MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
-		//			//Timestamp: aws.Time(m.Timestamp()),
-		//			//Unit: aws.String("StandardUnit"),
-		//			//Value: aws.Float64(m.Data().(float64)),
-		//			MetricName: aws.String("MetricsName"),
-		//			Timestamp: aws.Time(m.Timestamp()),
-		//			Unit: aws.String("StandardUnit"),
-		//			Value: aws.Float64(1.0),
-		//		},
-		//	},
-		//	Namespace: aws.String("snap"),
-		//}
-		//
-		//logger.Printf(input)
-		//
-		//_, err := svc.PutMetricData(input)
-		//if err != nil {
-		//	handleErr(err)
-		//}
+		input := &cloudwatch.PutMetricDataInput{
+			MetricData: []*cloudwatch.MetricDatum{
+				{
+					//MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
+					//Timestamp: aws.Time(m.Timestamp()),
+					//Unit: aws.String("StandardUnit"),
+					//Value: aws.Float64(m.Data().(float64)),
+					MetricName: aws.String("MetricsName"),
+					Timestamp: aws.Time(m.Timestamp()),
+					Unit: aws.String("StandardUnit"),
+					Value: aws.Float64(1.0),
+				},
+			},
+			Namespace: aws.String("snap"),
+		}
+
+		logger.Printf(input)
+
+		_, err := svc.PutMetricData(input)
+		if err != nil {
+			handleErr(err)
+		}
 	}
 
 	return nil

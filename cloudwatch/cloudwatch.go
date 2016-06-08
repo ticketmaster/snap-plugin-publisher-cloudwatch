@@ -83,24 +83,51 @@ func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config
 	return err
 }
 
+func getCloudwatchMetricValue(m plugin.MetricType) float64 {
+	var cloudwatchValue float64
+
+	if value, ok := m.Data().(int); ok {
+		cloudwatchValue = float64(value)
+	} else if value, ok := m.Data().(float64); ok {
+		cloudwatchValue = value
+	} else {
+		cloudwatchValue = 0.0
+	}
+
+	return cloudwatchValue
+}
+
+func getCloudwatchMetricDimension(m plugin.MetricType) []*cloudwatch.Dimension {
+	tags := m.Tags()
+
+	dimensions := make([]*cloudwatch.Dimension, len(tags), len(tags))
+	index := 0
+	for k, v := range tags {
+		dimensions[index] = &cloudwatch.Dimension{
+			Name: aws.String(k),
+			Value: aws.String(v),
+		}
+
+		index++
+	}
+
+	return dimensions
+}
+
 func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, config map[string]ctypes.ConfigValue, logger *log.Logger) error {
 	namespace := config["namespace"].(ctypes.ConfigValueStr).Value
 
 	for _, m := range metrics {
-		var cloudwatchValue float64
-
-		if value, ok := m.Data().(int); ok {
-			cloudwatchValue = float64(value)
-		} else if value, ok := m.Data().(float64); ok {
-			cloudwatchValue = value
-		}
+		cloudwatchMetricValue := getCloudwatchMetricValue(m)
+		cloudwatchMetricDimension := getCloudwatchMetricDimension(m)
 
 		input := &cloudwatch.PutMetricDataInput{
 			MetricData: []*cloudwatch.MetricDatum{
 				{
 					MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
 					Timestamp: aws.Time(m.Timestamp()),
-					Value: aws.Float64(cloudwatchValue),
+					Value: aws.Float64(cloudwatchMetricValue),
+					Dimensions: cloudwatchMetricDimension,
 				},
 			},
 			Namespace: aws.String(namespace),

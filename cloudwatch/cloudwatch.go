@@ -41,8 +41,13 @@ func (p *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
 	param1, err := cpolicy.NewStringRule("region", true)
 	handleErr(err)
 	param1.Description = "AWS Region"
-
 	config.Add(param1)
+
+	param2, err := cpolicy.NewStringRule("namespace", true)
+	handleErr(err)
+	param2.Description = "Metrics Namespace"
+	config.Add(param2)
+
 	cp.Add([]string{""}, config)
 
 	return cp, nil
@@ -71,28 +76,35 @@ func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config
 	err := publishDataToCloudWatch(
 		metrics,
 		svc,
+		config,
 		logger,
 	)
 
 	return err
 }
 
-func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, logger *log.Logger) error {
+func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, config map[string]ctypes.ConfigValue, logger *log.Logger) error {
+	namespace := config["namespace"].(ctypes.ConfigValueStr).Value
+
 	for _, m := range metrics {
+		var cloudwatchValue float64
+
+		if value, ok := m.Data().(int); ok {
+			cloudwatchValue = float64(value)
+		} else if value, ok := m.Data().(float64); ok {
+			cloudwatchValue = value
+		}
+
 		input := &cloudwatch.PutMetricDataInput{
 			MetricData: []*cloudwatch.MetricDatum{
 				{
 					MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
 					Timestamp: aws.Time(m.Timestamp()),
-					Unit: aws.String("StandardUnit"),
-					//Value: aws.Float64(m.Data().(float64)),
-					Value: aws.Float64(4.3),
+					Value: aws.Float64(cloudwatchValue),
 				},
 			},
-			Namespace: aws.String("snap-test"),
+			Namespace: aws.String(namespace),
 		}
-
-		logger.Printf(input)
 
 		_, err := svc.PutMetricData(input)
 		if err != nil {

@@ -44,60 +44,40 @@ This builds the plugin in `/build/rootfs/`
 * This plugin supports aws_access_key_id, aws_secret_access_key, and aws_session_token.  It will also works with EC2 instance using IAM Roles/Policies (CloudWatchFullAccess).
 
 ### Example Task
-```json
-{
-    "version": 1,
-    "schedule": {
-        "type": "simple",
-        "interval": "1s"
-    },
-    "workflow": {
-        "collect": {
-            "metrics": {
-                "/intel/psutil/load/load1": {},
-                "/intel/psutil/load/load5": {},
-                "/intel/psutil/load/load15": {},
-                "/intel/psutil/vm/available": {},
-                "/intel/psutil/vm/free": {},
-                "/intel/psutil/vm/used": {}
-            },
-            "config": {
-                "/intel/mock": {
-                    "password": "secret",
-                    "user": "root"
-                }
-            },
-            "tags": {
-                "/intel": {
-                   "cluster": "cluster_xyz",
-                   "region": "us-east-1"
-                }
-            },
-            "process": [
-                {
-                    "plugin_name": "passthru",
-                    "plugin_version": 1,
-                    "process": null,
-                    "publish": [
-                        {
-                            "plugin_name": "cloudwatch",
-                            "plugin_version": 1,
-                            "config": {
-                                "region": "us-east-1",
-                                "namespace": "snap"                    
-                            }
-                        }
-                    ],
-                    "config": null
-                }
-            ],
-            "publish": null
-        }
-    }
-}
+```
+---
+  version: 1
+  schedule:
+    type: "simple"
+    interval: "1s"
+  workflow:
+    collect:
+      metrics:
+        /intel/mock/foo: {}
+        /intel/mock/bar: {}
+        /intel/mock/*/boz: {}
+      config:
+        /intel/mock:
+          name: "root"
+          password: "secret"
+      tags:
+        /intel:
+          region: "us-east-1"
+          cluster: "cluster_xyz"
+      process:
+        -
+          plugin_name: "passthru"
+          process: null
+          publish:
+            -
+              plugin_name: "cloudwatch"
+              config:
+                region: "us-east-1"
+                namespace: "snap"
+
 ```
 Create task:
 ```
-$ snapctl task create -t sample-task.json
+$ snapctl task create -t sample-task.yaml
 ```
 

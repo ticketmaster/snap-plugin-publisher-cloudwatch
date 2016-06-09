@@ -15,6 +15,7 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
+	"strconv"
 )
 
 const (
@@ -83,20 +84,6 @@ func (p *cloudwatchPublisher) Publish(contentType string, content []byte, config
 	return err
 }
 
-func getCloudwatchMetricValue(m plugin.MetricType, logger *log.Logger) float64 {
-	var cloudwatchValue float64
-
-	if value, ok := m.Data().(int); ok {
-		cloudwatchValue = float64(value)
-	} else if value, ok := m.Data().(float64); ok {
-		cloudwatchValue = value
-	} else {
-		cloudwatchValue = 0.0
-	}
-
-	return cloudwatchValue
-}
-
 func getCloudwatchMetricDimension(m plugin.MetricType, logger *log.Logger) []*cloudwatch.Dimension {
 	tags := m.Tags()
 
@@ -119,24 +106,30 @@ func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudW
 	namespace := config["namespace"].(ctypes.ConfigValueStr).Value
 
 	for _, m := range metrics {
-		cloudwatchMetricValue := getCloudwatchMetricValue(m, logger)
-		cloudwatchMetricDimension := getCloudwatchMetricDimension(m, logger)
+		valueString := fmt.Sprintf("%v", m.Data())
+		cloudwatchMetricValue, err := strconv.ParseFloat(valueString, 64)
+		if err == nil {
+			logger.Printf("Converted Value: %s=%f", m.Namespace().String(), cloudwatchMetricValue)
+			cloudwatchMetricDimension := getCloudwatchMetricDimension(m, logger)
 
-		input := &cloudwatch.PutMetricDataInput{
-			MetricData: []*cloudwatch.MetricDatum{
-				{
-					MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
-					Timestamp: aws.Time(m.Timestamp()),
-					Value: aws.Float64(cloudwatchMetricValue),
-					Dimensions: cloudwatchMetricDimension,
+			input := &cloudwatch.PutMetricDataInput{
+				MetricData: []*cloudwatch.MetricDatum{
+					{
+						MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
+						Timestamp: aws.Time(m.Timestamp()),
+						Value: aws.Float64(cloudwatchMetricValue),
+						Dimensions: cloudwatchMetricDimension,
+					},
 				},
-			},
-			Namespace: aws.String(namespace),
-		}
+				Namespace: aws.String(namespace),
+			}
 
-		_, err := svc.PutMetricData(input)
-		if err != nil {
-			handleErr(err)
+			_, err := svc.PutMetricData(input)
+			if err != nil {
+				handleErr(err)
+			}
+		} else {
+			logger.Println("Unable to convert string onto float value: ", err, valueString)
 		}
 	}
 

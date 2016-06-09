@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package opentsdb
+package cloudwatch
 
 import (
 	"testing"
@@ -43,7 +43,7 @@ func TestCloudWatchPlugin(t *testing.T) {
 			So(op, ShouldNotBeNil)
 		})
 		Convey("So cloudwatch publisher should be of CloudWatchPublisher type", func() {
-			So(op, ShouldHaveSameTypeAs, &opentsdbPublisher{})
+			So(op, ShouldHaveSameTypeAs, &cloudwatchPublisher{})
 		})
 		configPolicy, err := op.GetConfigPolicy()
 		Convey("op.GetConfigPolicy() should return a config policy", func() {
@@ -65,14 +65,6 @@ func TestCloudWatchPlugin(t *testing.T) {
 			})
 			Convey("So testConfig processing should return no errors", func() {
 				So(errs.HasErrors(), ShouldBeFalse)
-			})
-			testConfig["region"] = ctypes.ConfigValueStr{Value: "us-east-1"}
-			cfg, errs = configPolicy.Get([]string{""}).Process(testConfig)
-			Convey("So config policy should not return a config after processing invalid testConfig", func() {
-				So(cfg, ShouldBeNil)
-			})
-			Convey("So testConfig processing should return errors", func() {
-				So(errs.HasErrors(), ShouldBeTrue)
 			})
 		})
 	})

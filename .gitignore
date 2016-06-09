@@ -54,3 +54,4 @@ README.html
 
 # Go
 vendor/
+*.cov

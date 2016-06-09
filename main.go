@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/ticketmaster/snap-plugin-publisher-cloudwatch/cloudwatch"
 	"github.com/intelsdi-x/snap/control/plugin"
+	"github.com/ticketmaster/snap-plugin-publisher-cloudwatch/cloudwatch"
 )
 
 func main() {

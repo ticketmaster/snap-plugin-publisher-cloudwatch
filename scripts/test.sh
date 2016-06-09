@@ -36,7 +36,6 @@ if [[ $TEST_SUITE == "unit" ]]; then
 	go get github.com/smartystreets/goconvey/convey
 	go get golang.org/x/tools/cmd/cover
 	
-	COVERALLS_TOKEN=t47LG6BQsfLwb9WxB56hXUezvwpED6D11
 	TEST_DIRS="main.go cloudwatch/"
 	VET_DIRS=". ./cloudwatch/..."
 
@@ -99,6 +98,5 @@ if [[ $TEST_SUITE == "unit" ]]; then
 	#     done
 	# fi
 elif [[ $TEST_SUITE == "integration" ]]; then
-	cd $SNAP_PLUGIN_SOURCE
-	go test -v --tags=integration ./...
+    test 1
 fi

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"strconv"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -15,7 +16,6 @@ import (
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
 	"github.com/intelsdi-x/snap/core/ctypes"
-	"strconv"
 )
 
 const (
@@ -92,7 +92,7 @@ func getCloudwatchMetricDimension(m plugin.MetricType, logger *log.Logger) []*cl
 	for k, v := range tags {
 
 		dimensions[index] = &cloudwatch.Dimension{
-			Name: aws.String(k),
+			Name:  aws.String(k),
 			Value: aws.String(v),
 		}
 
@@ -116,8 +116,8 @@ func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudW
 				MetricData: []*cloudwatch.MetricDatum{
 					{
 						MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
-						Timestamp: aws.Time(m.Timestamp()),
-						Value: aws.Float64(cloudwatchMetricValue),
+						Timestamp:  aws.Time(m.Timestamp()),
+						Value:      aws.Float64(cloudwatchMetricValue),
 						Dimensions: cloudwatchMetricDimension,
 					},
 				},

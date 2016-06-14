@@ -34,6 +34,12 @@ $ make
 ```
 This builds the plugin in `/build/rootfs/`
 
+To cross build either linux or OS X/macOS,
+```
+$ export GOOS=linux;make
+$ export GOOS=darwin;make
+```
+
 ### Configuration and Usage
 * Set up the [snap framework](https://github.com/intelsdi-x/snap/blob/master/README.md#getting-started)
 * Ensure `$SNAP_PATH` is exported  

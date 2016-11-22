@@ -84,6 +84,6 @@ $ export GOOS=darwin;make
 ```
 Create task:
 ```
-$ snapctl task create -t sample-task.yaml
+$ snaptel task create -t sample-task.yaml
 ```
 

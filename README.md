@@ -43,7 +43,7 @@ $ export GOOS=darwin;make
 ### Configuration and Usage
 * Set up the [snap framework](https://github.com/intelsdi-x/snap/blob/master/README.md#getting-started)
 * Ensure `$SNAP_PATH` is exported  
-`export SNAP_PATH=$GOPATH/src/github.com/intelsdi-x/snap/build`
+`export SNAP_PATH=$GOPATH/src/github.com/intelsdi-x/snap/build/linux/x86_64`
 
 ### Configure Amazon Web Service (AWS)
 * Install aws command line and [configure](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files) it correctly.

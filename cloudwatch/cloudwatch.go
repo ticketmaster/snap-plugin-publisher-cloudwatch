@@ -73,6 +73,11 @@ func (p *cloudwatchPublisher) GetConfigPolicy() (*cpolicy.ConfigPolicy, error) {
 	param2.Description = "Metrics Namespace"
 	config.Add(param2)
 
+	param3, err := cpolicy.NewIntegerRule("storage_resolution", false, 60)
+	handleErr(err)
+	param3.Description = "Storage Resolution"
+	config.Add(param3)
+
 	cp.Add([]string{""}, config)
 
 	return cp, nil
@@ -128,6 +133,7 @@ func getCloudwatchMetricDimension(m plugin.MetricType, logger *log.Logger) []*cl
 
 func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudWatch, config map[string]ctypes.ConfigValue, logger *log.Logger) error {
 	namespace := config["namespace"].(ctypes.ConfigValueStr).Value
+	storageResolution := int64(config["storage_resolution"].(ctypes.ConfigValueInt).Value)
 
 	for _, m := range metrics {
 		valueString := fmt.Sprintf("%v", m.Data())
@@ -139,10 +145,11 @@ func publishDataToCloudWatch(metrics []plugin.MetricType, svc *cloudwatch.CloudW
 			input := &cloudwatch.PutMetricDataInput{
 				MetricData: []*cloudwatch.MetricDatum{
 					{
-						MetricName: aws.String(strings.Join(m.Namespace().Strings(), ".")),
-						Timestamp:  aws.Time(m.Timestamp()),
-						Value:      aws.Float64(cloudwatchMetricValue),
-						Dimensions: cloudwatchMetricDimension,
+						MetricName:        aws.String(strings.Join(m.Namespace().Strings(), ".")),
+						Timestamp:         aws.Time(m.Timestamp()),
+						Value:             aws.Float64(cloudwatchMetricValue),
+						StorageResolution: aws.Int64(storageResolution),
+						Dimensions:        cloudwatchMetricDimension,
 					},
 				},
 				Namespace: aws.String(namespace),

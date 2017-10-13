@@ -80,6 +80,7 @@ $ export GOOS=darwin;make
               config:
                 region: "us-east-1"
                 namespace: "snap"
+                storage_resolution: 60
 
 ```
 Create task:

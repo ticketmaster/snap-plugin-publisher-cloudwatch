@@ -65,6 +65,7 @@ func TestCloudWatchPlugin(t *testing.T) {
 			testConfig := make(map[string]ctypes.ConfigValue)
 			testConfig["namespace"] = ctypes.ConfigValueStr{Value: "snap"}
 			testConfig["region"] = ctypes.ConfigValueStr{Value: "us-east-1"}
+			testConfig["storage_resolution"] = ctypes.ConfigValueInt{Value: 60}
 			cfg, errs := configPolicy.Get([]string{""}).Process(testConfig)
 			Convey("So config policy should process testConfig and return a config", func() {
 				So(cfg, ShouldNotBeNil)
